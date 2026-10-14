@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id         Int          @id @default(autoincrement())
+  email      String       @unique
+  name       String
+  createdAt  DateTime     @default(now())
+  garageCars GarageItem[]
+}
+
+model CarModel {
+  id              Int          @id @default(autoincrement())
+  externalMakeId  Int
+  makeName        String
+  externalModelId Int          @unique
+  modelName       String
+  garageItems     GarageItem[]
+
+  @@index([makeName])
+}
+
+model GarageItem {
+  id             Int      @id @default(autoincrement())
+  productionYear Int      @default(2000)
+  notes          String   @default("")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  userId         Int
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  carModelId     Int
+  carModel       CarModel @relation(fields: [carModelId], references: [id], onDelete: Restrict)
+}
